@@ -11,15 +11,16 @@ class SavingAcc(object):
         self.i = np.float32(nominal_interest / compounding_peridod)
         self.Bs = list()
         self.rate_yearly = np.round(nominal_interest * 100, 1)
+        self.months = range(1, 12)
+        self.saving_months = list(
+            map(lambda x: self.simulate_at_n(x, self.A, self.i, self.P),
+                self.months))
 
-    def simulate_at_n(self, n):
-        B_at_n = self.A * np.power((1 + self.i), n) + \
-            (self.P / self.i) * (np.power(1 + self.i, n) - 1)
+    @staticmethod
+    def simulate_at_n(n, A, i, P):
+        B_at_n = A * np.power((1 + i), n) + \
+            (P / i) * (np.power(1 + i, n) - 1)
         return B_at_n
-
-    def simulate_for_one_year(self):
-        self.months = range(1, 13)
-        self.saving_months = map(self.simulate_at_n, self.months)
 
     @staticmethod
     def autolabel(rects, ax):
@@ -35,8 +36,10 @@ class SavingAcc(object):
                 ha='center',
                 va='bottom')
 
+    def withdraw(self, n, amount):
+        raise Exception("withdrawal not allowed")
+
     def plot_one_year_saving(self):
-        self.simulate_for_one_year()
         fix, ax = plt.subplots(figsize=(14, 5))
         data_to_plot = list(self.months)
         y_pos = np.arange(len(data_to_plot))
@@ -52,5 +55,23 @@ class SavingAcc(object):
         plt.show()
 
 
-saving = SavingAcc(1000, 300, 0.01, 12)
-saving.plot_one_year_saving()
+#saving = SavingAcc(1000, 300, 0.01, 12)
+#saving.plot_one_year_saving()
+
+
+class SavingAccWithdrawal(SavingAcc):
+    def withdraw(self, month_n, amount):
+        self.saving_months[month_n
+                           - 1] = self.saving_months[month_n - 1] - amount
+        rest_of_the_years = self.months[month_n::]
+        # Recalculate for the rest of the year
+        saving_for_the_rest_of_the_year = map(
+            lambda x: self.simulate_at_n(x - month_n, self.saving_months[month_n - 1], self.i, self.P),
+            rest_of_the_years)
+        # Substitute results
+        self.saving_months[month_n::] = saving_for_the_rest_of_the_year
+
+
+saving_w = SavingAccWithdrawal(1000, 300, 0.01, 12)
+saving_w.withdraw(5, 2000)
+saving_w.plot_one_year_saving()
