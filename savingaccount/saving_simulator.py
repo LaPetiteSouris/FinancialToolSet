@@ -3,15 +3,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
+class NotAllowed(Exception):
+    pass
+
+
 class SavingAcc(object):
     def __init__(self, intial_sum, monthly_transfer, nominal_interest,
-                 compounding_peridod):
+                 compounding_peridod, length_of_simulation):
         self.A = np.float32(intial_sum)
         self.P = np.float32(monthly_transfer)
         self.i = np.float32(nominal_interest / compounding_peridod)
         self.Bs = list()
         self.rate_yearly = np.round(nominal_interest * 100, 1)
-        self.months = range(1, 12)
+        self.months = range(1, length_of_simulation + 1)
         self.saving_months = list(
             map(lambda x: self.simulate_at_n(x, self.A, self.i, self.P),
                 self.months))
@@ -37,7 +41,7 @@ class SavingAcc(object):
                 va='bottom')
 
     def withdraw(self, n, amount):
-        raise Exception("withdrawal not allowed")
+        raise NotAllowed("Withdrawal not allowed")
 
     def plot_one_year_saving(self):
         fix, ax = plt.subplots(figsize=(14, 5))
@@ -55,10 +59,6 @@ class SavingAcc(object):
         plt.show()
 
 
-#saving = SavingAcc(1000, 300, 0.01, 12)
-#saving.plot_one_year_saving()
-
-
 class SavingAccWithdrawal(SavingAcc):
     def withdraw(self, month_n, amount):
         self.saving_months[month_n
@@ -70,8 +70,3 @@ class SavingAccWithdrawal(SavingAcc):
             rest_of_the_years)
         # Substitute results
         self.saving_months[month_n::] = saving_for_the_rest_of_the_year
-
-
-saving_w = SavingAccWithdrawal(1000, 300, 0.01, 12)
-saving_w.withdraw(5, 2000)
-saving_w.plot_one_year_saving()
