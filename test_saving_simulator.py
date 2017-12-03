@@ -11,7 +11,7 @@ def test_simulate_yearly():
     saving = SavingAcc(120000, 0, 0.072, 12, 48)
     val = saving.saving_months[-1]
     assert 159913 == round(val)
-    val_36th = saving.saving_months[35]
+    val_36th = saving.get_amount_at_month_n(36)
     assert 148836 == round(val_36th)
 
 
@@ -25,7 +25,7 @@ def test_withdrawal():
     saving = SavingAccWithdrawal(1000, 500, 0.072, 12, 48)
     # Withdraw 2000EUR in the 5th month
     saving.withdraw(5, 2000)
-    assert round(saving.saving_months[4]) == 1561
+    assert round(saving.get_amount_at_month_n(5)) == 1561
     # Saving account without regular deposit
     # Initial deposit 120000 SEK
     # Compounding every 1 month, interest 7.2%
@@ -33,7 +33,7 @@ def test_withdrawal():
     saving = SavingAccWithdrawal(120000, 0, 0.072, 12, 48)
     # Withdraw 20000 SEK in the 18th month
     saving.withdraw(18, 20000)
-    assert round(saving.saving_months[-1]) == 135982
+    assert round(saving.get_amount_at_month_n(48)) == 135982
 
 
 def test_simulate_at_n():

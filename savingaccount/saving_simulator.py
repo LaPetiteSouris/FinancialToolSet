@@ -20,6 +20,9 @@ class SavingAcc(object):
             map(lambda x: self.simulate_at_n(x, self.A, self.i, self.P),
                 self.months))
 
+    def get_amount_at_month_n(self, n):
+        return self.saving_months[n - 1]
+
     @staticmethod
     def simulate_at_n(n, A, i, P):
         B_at_n = A * np.power((1 + i), n) + \
