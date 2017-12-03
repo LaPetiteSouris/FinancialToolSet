@@ -73,3 +73,8 @@ class SavingAccWithdrawal(SavingAcc):
             rest_of_the_years)
         # Substitute results
         self.saving_months[month_n::] = saving_for_the_rest_of_the_year
+
+
+# saving = SavingAccWithdrawal(1000, 300, 0.01, 12, 12)
+# saving.withdraw(5, 2000)
+# saving.plot_one_year_saving()
